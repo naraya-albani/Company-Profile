@@ -1,0 +1,164 @@
+<!doctype html>
+<html lang="id">
+  <head>
+    <meta charset="utf-8" />
+    <meta name="viewport" content="width=device-width, initial-scale=1" />
+    <title>Admin Layanan</title>
+    <link
+      href="https://fonts.googleapis.com/css2?family=Plus+Jakarta+Sans:wght@400;600;800&display=swap"
+      rel="stylesheet"
+    />
+
+    <!-- Tailwind CSS v4 (CDN) — tema sama dengan index.html -->
+    <script src="https://cdn.jsdelivr.net/npm/@tailwindcss/browser@4"></script>
+    <style type="text/tailwindcss">
+      @theme {
+        --color-utama: #1d4ed8;
+        --color-utama-gelap: #1e3a8a;
+        --color-aksen: #f59e0b;
+        --color-teks: #1f2937;
+        --color-teks-lembut: #64748b;
+        --color-abu: #f1f5f9;
+        --color-garis: #e2e8f0;
+
+        --font-sans: "Plus Jakarta Sans", system-ui, sans-serif;
+        --radius-kartu: 14px;
+        --shadow-kartu: 0 10px 30px -12px rgb(15 23 42 / 0.18);
+        --container-wadah: 1120px;
+
+        /* Tampilan HP sampai 800px, desktop mulai 801px */
+        --breakpoint-md: 50.0625rem;
+      }
+
+      @layer base {
+        h1,
+        h2,
+        h3 {
+          @apply mb-3 font-bold leading-tight;
+        }
+        h1 {
+          font-size: 2rem;
+        }
+        h2 {
+          font-size: clamp(1.6rem, 3vw, 2.25rem);
+        }
+        :focus-visible {
+          @apply outline-3 outline-offset-2 outline-aksen;
+        }
+      }
+
+      /* Elemen yang dibuat admin.js (baris tabel, status form) */
+      @layer components {
+        #tabel-layanan td {
+          @apply border-b border-garis px-4 py-3 text-left;
+        }
+        #tabel-layanan td button {
+          @apply cursor-pointer rounded-lg border border-slate-300 bg-white px-[0.8rem] py-[0.3rem] hover:bg-abu;
+        }
+        @media (width < 50.0625rem) {
+          #tabel-layanan td:nth-child(2) {
+            @apply hidden;
+          }
+        }
+        .berhasil {
+          @apply font-semibold text-green-700;
+        }
+        .gagal {
+          @apply font-semibold text-red-700;
+        }
+      }
+    </style>
+  </head>
+  <body class="halaman-admin bg-white font-sans leading-[1.7] text-teks">
+    <header
+      class="navbar sticky top-0 z-50 border-b border-garis bg-white/90 backdrop-blur-[8px]"
+    >
+      <div
+        class="mx-auto flex h-[70px] max-w-wadah items-center justify-between px-6"
+      >
+        <a
+          href="/"
+          class="inline-flex items-center gap-[0.6rem] font-extrabold text-teks"
+          >PT Contoh Jaya</a
+        >
+        <span>Admin</span>
+      </div>
+    </header>
+
+    <main>
+      <section class="mx-auto max-w-[900px] px-6 py-8">
+        <h1>Kelola Layanan</h1>
+
+        <form
+          id="form-layanan"
+          class="flex max-w-[500px] flex-col gap-[0.4rem]"
+        >
+          <input type="hidden" name="id" />
+          <label for="nama" class="text-[0.95rem] font-semibold"
+            >Nama layanan</label
+          >
+          <input
+            id="nama"
+            name="nama"
+            required
+            maxlength="100"
+            class="mb-[0.6rem] rounded-[10px] border border-slate-300 px-[0.9rem] py-[0.7rem] focus:border-utama focus:outline-3 focus:outline-blue-200"
+          />
+
+          <label for="deskripsi" class="text-[0.95rem] font-semibold"
+            >Deskripsi</label
+          >
+          <textarea
+            id="deskripsi"
+            name="deskripsi"
+            rows="3"
+            class="mb-[0.6rem] rounded-[10px] border border-slate-300 px-[0.9rem] py-[0.7rem] focus:border-utama focus:outline-3 focus:outline-blue-200"
+          ></textarea>
+
+          <button
+            type="submit"
+            id="tombol-simpan"
+            class="inline-block cursor-pointer self-start rounded-full border-2 border-utama bg-utama px-6 py-3 font-semibold text-white transition duration-150 hover:-translate-y-0.5 hover:border-utama-gelap hover:bg-utama-gelap disabled:translate-y-0 disabled:cursor-wait disabled:opacity-60"
+          >
+            Tambah
+          </button>
+          <button
+            type="button"
+            id="tombol-batal"
+            hidden
+            class="cursor-pointer self-start rounded-full border-2 border-slate-300 bg-white px-6 py-[0.6rem] font-semibold text-teks hover:bg-abu"
+          >
+            Batal
+          </button>
+          <p id="status-admin" role="status"></p>
+        </form>
+      </section>
+
+      <section class="mx-auto max-w-[900px] px-6 py-8">
+        <h2>Daftar Layanan</h2>
+        <table
+          class="w-full border-collapse overflow-hidden rounded-kartu bg-white shadow-kartu"
+        >
+          <thead>
+            <tr>
+              <th class="border-b border-garis bg-abu px-4 py-3 text-left">
+                Nama
+              </th>
+              <th
+                class="hidden border-b border-garis bg-abu px-4 py-3 text-left md:table-cell"
+              >
+                Deskripsi
+              </th>
+              <th class="border-b border-garis bg-abu px-4 py-3 text-left">
+                Aksi
+              </th>
+            </tr>
+          </thead>
+          <tbody id="tabel-layanan"></tbody>
+        </table>
+      </section>
+    </main>
+
+    <script src="admin.js"></script>
+  </body>
+</html>
