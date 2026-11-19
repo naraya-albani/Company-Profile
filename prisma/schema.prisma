@@ -13,3 +13,11 @@ model services {
     nama      String  @db.VarChar(100)
     deskripsi String? @db.Text
 }
+
+model users {
+    id        Int      @id @default(autoincrement())
+    nama      String
+    email     String   @unique
+    password  String
+    createdAt DateTime @default(now())
+}

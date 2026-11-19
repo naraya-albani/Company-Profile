@@ -3,6 +3,48 @@ const tabel = document.querySelector("#tabel-layanan");
 const statusAdmin = document.querySelector("#status-admin");
 const tombolSimpan = document.querySelector("#tombol-simpan");
 const tombolBatal = document.querySelector("#tombol-batal");
+const namaAdmin = document.querySelector("#nama-admin");
+const tombolLogout = document.querySelector("#tombol-logout");
+
+// ---------------------------------------------------------------------------
+// Sesi login
+// ---------------------------------------------------------------------------
+
+// Kalau sesi sudah habis (server membalas 401), kembali ke halaman login.
+function cekSesiHabis(res) {
+  if (res.status === 401) {
+    location.replace("/login.html");
+    return true;
+  }
+  return false;
+}
+
+// Ambil pesan error dari respons server (services memakai "error", auth memakai "pesan").
+async function pesanError(res, cadangan) {
+  const data = await res.json().catch(() => ({}));
+  return data.error || data.pesan || cadangan;
+}
+
+async function tampilkanNamaAdmin() {
+  try {
+    const res = await fetch("/api/auth/me");
+    if (cekSesiHabis(res) || !res.ok) return;
+    const { user } = await res.json();
+    namaAdmin.textContent = user.nama;
+  } catch {
+    // biarkan tetap tertulis "Admin"
+  }
+}
+
+tombolLogout.addEventListener("click", async () => {
+  tombolLogout.disabled = true;
+  await fetch("/api/auth/logout", { method: "POST" }).catch(() => {});
+  location.replace("/login.html");
+});
+
+// ---------------------------------------------------------------------------
+// Kelola layanan
+// ---------------------------------------------------------------------------
 
 function modeTambah() {
   form.reset();
@@ -55,7 +97,9 @@ async function hapusLayanan(item) {
   if (!confirm(`Hapus layanan "${item.nama}"?`)) return;
   try {
     const res = await fetch(`/api/services/${item.id}`, { method: "DELETE" });
-    if (!res.ok) throw new Error((await res.json()).error);
+    if (cekSesiHabis(res)) return;
+    if (!res.ok)
+      throw new Error(await pesanError(res, "Gagal menghapus layanan."));
     statusAdmin.textContent = "Layanan dihapus.";
     modeTambah();
     muatLayanan();
@@ -73,7 +117,9 @@ form.addEventListener("submit", async (e) => {
       headers: { "Content-Type": "application/json" },
       body: JSON.stringify(data),
     });
-    if (!res.ok) throw new Error((await res.json()).error);
+    if (cekSesiHabis(res)) return;
+    if (!res.ok)
+      throw new Error(await pesanError(res, "Gagal menyimpan layanan."));
     statusAdmin.textContent = id
       ? "Layanan diperbarui."
       : "Layanan ditambahkan.";
@@ -86,4 +132,5 @@ form.addEventListener("submit", async (e) => {
 
 tombolBatal.addEventListener("click", modeTambah);
 
+tampilkanNamaAdmin();
 muatLayanan();
